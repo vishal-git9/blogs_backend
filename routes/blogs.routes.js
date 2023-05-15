@@ -44,7 +44,7 @@ blogRouter.get("/blogs/comments",async(req,res)=>{
 
 blogRouter.post("/blogs",blogMiddleware,async(req,res)=>{
     try {
-        const blogData = new blogsModel(req.body)
+        const blogData = new blogsModel.blogsModel(req.body)
         await blogData.save()
         res.status(201).send({msg:"added a new blog"})
     } catch (error) {
