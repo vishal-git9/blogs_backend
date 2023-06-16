@@ -6,7 +6,7 @@ const blogsSchema = new mongoose.Schema({
   content: String,
   category: String,
   date: String,
-  likes: String,
+  likes: Number,
   userId: String,
   comments: [{commentId:{type:mongoose.Schema.Types.ObjectId,ref:"commentsModel"}}]
   // 64621a20b9d1853f5545e9e2
