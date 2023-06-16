@@ -31,7 +31,7 @@ blogRouter.get("/blogs",async(req,res)=>{
 blogRouter.get("/blogs/user",async(req,res)=>{
     const token = req.headers.authorization
     try {
-        jwt.verify(token,"user",(err,found)=>{
+        jwt.verify(token,"user",async(err,found)=>{
         if(found){
                 const userData = await blogsModel.blogsModel.find({userId:found.userId}).populate({path:"comments.commentId",populate:"userId"})
                 res.status(200).send({msg:"all blogs of this user",userData})
