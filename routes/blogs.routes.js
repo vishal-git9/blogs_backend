@@ -2,6 +2,7 @@ const express = require("express")
 const blogsModel = require("../models/blog.model")
 const blogMiddleware = require("../middlewares/blog.middleware")
 const authMiddleware = require("../middlewares/auth.middlware")
+const jwt = require("jsonwebtoken")
 const blogRouter = express.Router()
 blogRouter.get("/blogs",async(req,res)=>{
     const {category,title,sort,page,limit,order} = req.query
