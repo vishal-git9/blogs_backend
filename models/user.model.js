@@ -1,12 +1,21 @@
 const mongoose = require("mongoose");
 
 const userSchema = mongoose.Schema({
+  _id:mongoose.Schema.Types.ObjectId,
   username: String,
   avatar: String,
   email: String,
   password: String,
 });
 
-const userModel = mongoose.model("Userdb", userSchema);
+const blackListed_Token_Schema = new mongoose.Schema({
+  token:String
+})
 
-module.exports = userModel;
+const userModel = mongoose.model("Userdb", userSchema);
+const blackListed_Token_Model = mongoose.model("blackListed_Tokendb", blackListed_Token_Schema);
+
+module.exports = {
+  userModel,
+  blackListed_Token_Model
+}

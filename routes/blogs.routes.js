@@ -1,9 +1,8 @@
 const express = require("express")
 const blogsModel = require("../models/blog.model")
 const blogMiddleware = require("../middlewares/blog.middleware")
+const authMiddleware = require("../middlewares/auth.middlware")
 const blogRouter = express.Router()
-
-
 blogRouter.get("/blogs",async(req,res)=>{
     const {category,title,sort,page,limit,order} = req.query
     const queryObj = {}
@@ -29,6 +28,14 @@ blogRouter.get("/blogs",async(req,res)=>{
     }
 })
 
+blogRouter.get("/blogs/user/:id",async(req,res)=>{
+    try {
+        const userData = await blogsModel.blogsModel.find({userId:req.params.id})
+        res.status(200).send({msg:"all blogs of this user",userData})
+    } catch (error) {
+        res.status(400).send({msg:"error while fetching the blogs"})
+    }
+})
 
 // get user by username
 
@@ -44,7 +51,7 @@ blogRouter.get("/blogs/comments",async(req,res)=>{
 
 blogRouter.post("/blogs",blogMiddleware,async(req,res)=>{
     try {
-        const blogData = new blogsModel(req.body)
+        const blogData = new blogsModel.blogsModel(req.body)
         await blogData.save()
         res.status(201).send({msg:"added a new blog"})
     } catch (error) {
@@ -70,13 +77,22 @@ blogRouter.post("/blogs/update/:id",async(req,res)=>{
     }
 })
 
-blogRouter.patch("/blogs/update/:id",blogMiddleware,async(req,res)=>{
+blogRouter.patch("/blogs/update/:id",authMiddleware,async(req,res)=>{
     const {id} = req.params
     try {
         const getDocument = await blogsModel.blogsModel.findByIdAndUpdate(id,req.body)
         res.status(201).send({msg:"added a new like"})
     } catch (error) {
         res.status(400).send({msg:"error while adding like"})
+    }
+})
+blogRouter.delete("/blogs/delete/:id",authMiddleware,async(req,res)=>{
+    const {id} = req.params
+    try {
+        const getDocument = await blogsModel.blogsModel.findByIdAndDelete(id)
+        res.status(201).send({msg:"deleted the blog"})
+    } catch (error) {
+        res.status(400).send({msg:"error while deleting blog"})
     }
 })
 

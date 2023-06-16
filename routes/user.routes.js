@@ -2,23 +2,23 @@ const express = require("express")
 const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
 const userModel = require("../models/user.model")
+const { blogsModel } = require("../models/blog.model")
 const userRouter = express.Router()
 
 userRouter.get("/users",async(req,res)=>{
     try {
-        const userData = await userModel.find()
+        const userData = await userModel.userModel.find()
         res.status(200).send({msg:"here is all the users data",userData})
     } catch (error) {
         res.status(400).send({msg:"error while fetching the data"})
     }
 })
 userRouter.post("/register",async(req,res)=>{
-    console.log(req.body)
     const {email,password} = req.body
     const hashedPass = bcrypt.hashSync(password,10)
     const userData = {...req.body,password:hashedPass}
     try {
-        const checkedData = await userModel.find({email:email})
+        const checkedData = await userModel.userModel.find({email:email})
         console.log(checkedData)
         if(checkedData.length>0){
             res.status(400).send({msg:"User already exist, please login"})
@@ -35,11 +35,12 @@ userRouter.post("/register",async(req,res)=>{
 userRouter.post("/login",async(req,res)=>{
     const {email,password} = req.body
     try {
-        const userData = await userModel.find({email})
+        const userData = await userModel.userModel.find({email})
         const hashedPass = userData[0].password
         const decoded = bcrypt.compareSync(password,hashedPass)
         if(decoded){
-            res.status(201).send({msg:"login successfully",token:jwt.sign({userId:userData[0]._id},"user"),userData})
+            const blogsData = await blogsModel.find({userId:userData[0]._id}).populate({path:"comments.commentId",populate:"userId"})
+            res.status(201).send({msg:"login successfully",token:jwt.sign({userId:userData[0]._id},"user",{expiresIn:"7 days"}),refresh_token:jwt.sign({userId:userData[0]._id},"refresh_user",{expiresIn:"28 days"}),userData,blogsData})
         }else{
             res.status(400).send({msg:"No account exist"})
         }
@@ -61,7 +62,7 @@ userRouter.patch("/users/:id/reset",async(req,res)=>{
     const {current,newPass} = req.body
     console.log(id)
     try {
-        const user_database = await userModel.find({_id:id})
+        const user_database = await userModel.userModel.find({_id:id})
         const hashedPass = user_database[0].password
         const decoded = bcrypt.compareSync(current,hashedPass)
         if(decoded){
@@ -73,6 +74,16 @@ userRouter.patch("/users/:id/reset",async(req,res)=>{
         }
     } catch (error) {
         res.status(400).send({msg:"Update passowrd failed"})
+    }
+})
+
+userRouter.post("/logout",async(req,res)=>{
+    try {
+        const blackListed_Token = new userModel.blackListed_Token_Model(req.body)
+        await blackListed_Token.save()
+        res.status(202).send({msg:"user is logged out"})
+    } catch (error) {
+        res.status(404).send({msg:"error while logging out the user"})
     }
 })
 
