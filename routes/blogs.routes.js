@@ -28,10 +28,17 @@ blogRouter.get("/blogs",async(req,res)=>{
     }
 })
 
-blogRouter.get("/blogs/user/:id",async(req,res)=>{
+blogRouter.get("/blogs/user",async(req,res)=>{
+    const token = req.headers.authorization
     try {
-        const userData = await blogsModel.blogsModel.find({userId:req.params.id})
-        res.status(200).send({msg:"all blogs of this user",userData})
+        jwt.verify(token,"user",(err,found)=>{
+        if(found){
+                const userData = await blogsModel.blogsModel.find({userId:found.userId}).populate({path:"comments.commentId",populate:"userId"})
+                res.status(200).send({msg:"all blogs of this user",userData})
+        }else{
+            res.status(404).send({msg:"you are not authorized for this action"})
+        }
+    })
     } catch (error) {
         res.status(400).send({msg:"error while fetching the blogs"})
     }
