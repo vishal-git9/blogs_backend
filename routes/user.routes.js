@@ -67,7 +67,7 @@ userRouter.patch("/users/:id/reset",async(req,res)=>{
         const decoded = bcrypt.compareSync(current,hashedPass)
         if(decoded){
             const newHashedPass = bcrypt.hashSync(newPass,10)
-            await userModel.findByIdAndUpdate(id,{password:newHashedPass})
+            await userModel.userModel.findByIdAndUpdate(id,{password:newHashedPass})
             res.status(202).send({msg:"password updated succesfully"})
         }else{
             res.status(400).send({msg:"no account exist with this current password"})
