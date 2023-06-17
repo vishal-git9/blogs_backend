@@ -23,7 +23,7 @@ userRouter.post("/register",async(req,res)=>{
         if(checkedData.length>0){
             res.status(400).send({msg:"User already exist, please login"})
         }else{
-            const setuserData = new userModel(userData)
+            const setuserData = new userModel.userModel(userData)
             await setuserData.save()
             res.status(201).send({msg:"registerd successfully"})
         }
