@@ -7,7 +7,7 @@ const blogsSchema = new mongoose.Schema({
   category: String,
   date: String,
   likes: Number,
-  userId: String,
+  userId: {type:mongoose.Schema.Types.ObjectId,ref:"Userdb"},
   comments: [{commentId:{type:mongoose.Schema.Types.ObjectId,ref:"commentsModel"}}]
   // 64621a20b9d1853f5545e9e2
 });
