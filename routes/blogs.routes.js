@@ -22,7 +22,7 @@ blogRouter.get("/blogs",async(req,res)=>{
         }
     }
     try {
-        const blogData = await blogsModel.blogsModel.find(queryObj).populate({path:"comments.commentId",populate:"userId"}).sort({date:sortWise}).skip((Number(page)-1)*limit).limit(limit)
+        const blogData = await blogsModel.blogsModel.find(queryObj).populate({path:"comments.commentId",populate:"userId"}).populate("userId").sort({date:sortWise}).skip((Number(page)-1)*limit).limit(limit)
         res.status(200).send({msg:"here is all the blogs",blogData})
     } catch (error) {
         res.status(400).send({msg:"error while fetching blogs"})
